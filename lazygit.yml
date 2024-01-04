@@ -1,0 +1,77 @@
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+  log:
+    order: "topo-order"
+    showGraph: "always"
+  branchLogCmd: "git log --graph --pretty=custom"
+  mainBranches: [master, main, develop]
+  promptToReturnFromSubprocess: false
+  commitPrefixes:
+    work: # extraxt ticket number from branch name and place it in commit message
+      pattern: "(IMOWAPP-[0-9]{4}).*"
+      replace: "[$1]"
+
+gui:
+  nerdFontsVersion: "3"
+  sidePanelWidth: 0.2
+  showBottomLine: false
+  border: "rounded"
+  authorColors:
+    "Carmen Geelhaar": "#ca9ee6"
+    "camina": "#ca9ee6"
+    "*": "#85c1dc" # sapphire
+  # use the frappe catpucchin theme
+  theme:
+    lightTheme: false
+    activeBorderColor:
+      - "#ebcb8b" # yellow
+      - bold
+    inactiveBorderColor:
+      - "#838ba7" # Overlay1
+    optionsTextColor:
+      - "#8caaee" # Blue
+    selectedLineBgColor:
+      - "#51576d" # Surface0
+    selectedRangeBgColor:
+      - "#51576d" # Surface0
+    cherryPickedCommitBgColor:
+      - "#81c8be" # Teal
+    cherryPickedCommitFgColor:
+      - "#8caaee" # Blue
+    unstagedChangesColor:
+      - "#ea999c" # Red
+
+os:
+  edit: "vim {{filename}}"
+  editAtLine: "vim --line={{line}} {{filename}}"
+  editAtLineAndWait: "vim --block --line={{line}} {{filename}}"
+  editInTerminal: true
+  openDirInEditor: "vim {{dir}}"
+
+customCommands:
+  - key: "l"
+    command: "commit"
+    description: "conventional commit"
+    context: "files"
+    loadingText: "opening gum commit tool"
+    subprocess: true
+  - key: "<c-a>"
+    description: "Search the whole history (From a ref and down) for an expression in a file"
+    command: "git checkout {{index .PromptResponses 3}}"
+    context: "commits"
+    prompts:
+      - type: "input"
+        title: "Search word:"
+      - type: "input"
+        title: "File/Subtree:"
+      - type: "input"
+        title: "Ref:"
+        initialValue: "{{index .CheckedOutBranch.Name }}"
+      - type: "menuFromCommand"
+        title: "Commits:"
+        command: "git log --oneline {{index .PromptResponses 2}} -S'{{index .PromptResponses 0}}' --all -- {{index .PromptResponses 1}}"
+        filter: "(?P<commit_id>[0-9a-zA-Z]*) *(?P<commit_msg>.*)"
+        valueFormat: "{{ .commit_id }}"
+        labelFormat: "{{ .commit_id | green | bold }} - {{ .commit_msg | yellow }}"
